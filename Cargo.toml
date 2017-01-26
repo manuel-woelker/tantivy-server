@@ -1,0 +1,9 @@
+[package]
+name = "tantivy-server"
+version = "0.1.0"
+authors = ["Manuel Woelker <github@manuel.woelker.org>"]
+
+[dependencies]
+iron = "0.4.0"
+mount = "0.2.1"
+staticfile = "0.3.1"

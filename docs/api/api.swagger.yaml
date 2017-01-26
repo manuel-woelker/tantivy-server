@@ -1,0 +1,72 @@
+# Blobstore API
+swagger: '2.0'
+info:
+  title: Tantivy Server REST API
+  description: Restful Search Service
+  version: "0.0.1"
+# the domain of the service
+#host: api.uber.com
+# array of all schemes that your API supports
+schemes:
+  - http
+# will be prefixed to all paths
+basePath: /api
+produces:
+  - application/json
+paths:
+  /status:
+    get:
+      summary: Get system status
+      description: |
+        Get the information about the status of the system, i.e. health and version information
+      tags:
+        - Status
+      responses:
+        200:
+          description: A description of the current system status
+          schema:
+            $ref: '#/definitions/Status'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+definitions:
+  Error:
+    type: object
+    properties:
+      reason:
+        type: string
+        description: The reason code for the error
+      description:
+        type: string
+        description: The description of the error
+  Status:
+    type: object
+    properties:
+      health:
+        type: string
+        description: The health of the system (green, yellow, red)
+      state:
+        type: string
+        description: The state of the system (operational, ...)
+      version_information:
+          $ref: '#/definitions/VersionInformation'
+  VersionInformation:
+    type: object
+    description: Version information
+    properties:
+      version:
+        type: string
+        description: The server version
+      revision:
+        type: string
+        description: The server git revision
+      revision_date:
+        type: string
+        description: The date of the last git commit
+      rust_version:
+        type: string
+        description: The rust version used to built this instance
+tags:
+  - name: Status
+    description: System status information
