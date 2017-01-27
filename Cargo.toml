@@ -4,6 +4,10 @@ version = "0.1.0"
 authors = ["Manuel Woelker <github@manuel.woelker.org>"]
 
 [dependencies]
+
+env_logger = "0.4.0"
+log = "0.3.6"
+time = "0.1.36"
 iron = "0.4.0"
 mount = "0.2.1"
 staticfile = "0.3.1"

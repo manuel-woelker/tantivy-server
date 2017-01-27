@@ -1,7 +1,13 @@
+#[macro_use]
+extern crate log;
+
+extern crate env_logger;
+
 extern crate iron;
 extern crate mount;
 extern crate staticfile;
 extern crate hyper;
+extern crate time;
 
 extern crate serde;
 #[macro_use]
@@ -21,6 +27,10 @@ use mount::Mount;
 use staticfile::Static;
 use serde::Serialize;
 use iron::modifier::Modifier;
+
+use std::env;
+use log::{LogRecord, LogLevelFilter};
+use env_logger::LogBuilder;
 
 #[derive(Debug, Serialize, Deserialize)]
 struct StatusResponse {
@@ -49,10 +59,33 @@ impl <T: Serialize + Send> WriteBody for Json<T> {
 }
 
 fn main() {
-    let status_response = StatusResponse {version: env!("CARGO_PKG_VERSION").into(), health: "octarine".into()};
-    println!("Status: {:?}", status_response);
+    let format = |record: &LogRecord| {
+        let t = time::now_utc();
+        let location = record.location();
+        format!(
+            "{}.{:03} {:4.4} {} [{:10.10}|{:.15}:{}]",
+            time::strftime("%Y-%m-%d %H:%M:%S", &t).unwrap(),
+            t.tm_nsec / 1000_000,
+            record.level(),
+            record.args(),
+            location.module_path(),
+            location.file(),
+            location.line(),
+        )
+    };
+
+    let mut builder = LogBuilder::new();
+    builder.format(format).filter(None, LogLevelFilter::Info);
+
+    if env::var("RUST_LOG").is_ok() {
+        builder.parse(&env::var("RUST_LOG").unwrap());
+    }
+
+    builder.init().unwrap();
+
+
     let port = 3000;
-    println!("Starting server on port {}", port);
+    info!("Starting server on port {}", port);
     let mut mount = Mount::new();
 
     // Serve the shared JS/CSS at /
@@ -73,6 +106,6 @@ fn main() {
 
     let listening = Iron::new(mount).http("localhost:3000");
     let listening = listening.unwrap();
-    println!("Server started on http://localhost:{}/", port);
-    println!("{:?}", listening);
+    info!("Server started on http://localhost:{}/", port);
+    std::mem::drop(listening);
 }
