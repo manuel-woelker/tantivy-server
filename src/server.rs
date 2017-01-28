@@ -15,6 +15,8 @@ use iron::modifier::Modifier;
 use std;
 
 use api;
+use errors::*;
+
 use serde_json;
 
 
@@ -48,7 +50,7 @@ impl Server {
         Server {}
     }
 
-    pub fn run(&self) {
+    pub fn run(&self) -> Result<()> {
         let port = 3000;
         let mut mount = Mount::new();
 
@@ -62,9 +64,9 @@ impl Server {
                     Static::new(Path::new("assets/swagger-ui/")));
         mount.mount("/api/status", api::status::StatusHandler {});
 
-        let listening = Iron::new(mount).http("localhost:3000");
-        let listening = listening.unwrap();
+        let listening = Iron::new(mount).http("localhost:3000")?;
         info!("Server started on http://localhost:{}/", port);
         std::mem::drop(listening);
+        Ok(())
     }
 }

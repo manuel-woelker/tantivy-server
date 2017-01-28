@@ -17,9 +17,13 @@ extern crate serde_derive;
 
 extern crate serde_json;
 
+#[macro_use]
+extern crate error_chain;
+
 pub mod start;
 pub mod server;
 pub mod api;
+pub mod errors;
 
 
 
