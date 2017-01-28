@@ -9,6 +9,8 @@ extern crate staticfile;
 extern crate hyper;
 extern crate time;
 
+extern crate tantivy;
+
 extern crate serde;
 #[macro_use]
 extern crate serde_derive;
@@ -32,10 +34,11 @@ use std::env;
 use log::{LogRecord, LogLevelFilter};
 use env_logger::LogBuilder;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize)]
 struct StatusResponse {
-    version: String,
-    health: String,
+    health: &'static str,
+    version: &'static str,
+    tantivy_version: &'static str,
 }
 
 struct Json<T: Serialize>(T);
@@ -85,7 +88,7 @@ fn main() {
 
 
     let port = 3000;
-    info!("Starting server on port {}", port);
+    info!("Starting up (Version: {}, tantivy version: {})", env!("CARGO_PKG_VERSION"), tantivy::version());
     let mut mount = Mount::new();
 
     // Serve the shared JS/CSS at /
@@ -99,7 +102,7 @@ fn main() {
 /*        Ok(Response::with((status::Ok, Header(ContentType(Mime(TopLevel::Application, SubLevel::Json,
                                                          vec![(Attr::Charset, Value::Utf8)]))), format!("{{\"status\": \"green\", \"version\": \"{}\"}}", env!("CARGO_PKG_VERSION")))))
                                                          */
-        let status_response = StatusResponse {version: env!("CARGO_PKG_VERSION").into(), health: "octarine".into()};
+        let status_response = StatusResponse {health: "octarine", version: env!("CARGO_PKG_VERSION"), tantivy_version: tantivy::version()};
         Ok(Response::with((status::Ok, Json(status_response))))
 
     });

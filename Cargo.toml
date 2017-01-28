@@ -16,3 +16,5 @@ hyper="0.9.17"
 serde = "0.9"
 serde_derive = "0.9"
 serde_json = "0.9"
+
+tantivy = { git="https://github.com/tantivy-search/tantivy.git", rev = "b6423f9a"}
