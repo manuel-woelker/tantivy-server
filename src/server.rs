@@ -4,7 +4,7 @@ use iron::status;
 use std::path::Path;
 
 use iron::headers::ContentType;
-use iron::response::{WriteBody, ResponseBody};
+use iron::response::{WriteBody};
 use iron::mime::{Mime, TopLevel, SubLevel, Attr, Value};
 
 use mount::Mount;
@@ -36,15 +36,13 @@ fn json_to_io_error(e: serde_json::Error) -> std::io::Error {
 }
 
 impl<T: Serialize + Send> WriteBody for JsonResponse<T> {
-    fn write_body(&mut self, res: &mut ResponseBody) -> std::io::Result<()> {
+    fn write_body(&mut self, res: &mut std::io::Write) -> std::io::Result<()> {
         serde_json::ser::to_writer_pretty(res, &self.0).map_err(json_to_io_error)?;
         Ok(())
     }
 }
 
-
 pub struct Server {}
-
 impl Server {
     pub fn new() -> Server {
         Server {}
@@ -62,8 +60,11 @@ impl Server {
                     Static::new(Path::new("docs/api/api.swagger.yaml")));
         mount.mount("/docs/swagger/",
                     Static::new(Path::new("assets/swagger-ui/")));
-        mount.mount("/api/status", api::status::StatusHandler {});
 
+        let mut api_mount = Mount::new();
+        api_mount.mount("/status", api::status::StatusHandler {});
+        api_mount.mount("/index", api::index::CreateIndexHandler {});
+        mount.mount("/api", api_mount);
         let listening = Iron::new(mount).http("localhost:3000")?;
         info!("Server started on http://localhost:{}/", port);
         std::mem::drop(listening);

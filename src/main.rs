@@ -7,6 +7,7 @@ extern crate iron;
 extern crate mount;
 extern crate staticfile;
 extern crate hyper;
+extern crate bodyparser;
 extern crate time;
 
 extern crate tantivy;

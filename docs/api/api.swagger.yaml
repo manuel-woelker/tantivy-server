@@ -30,6 +30,37 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
+  /index:
+    put:
+      summary: Create a new index
+      description: |
+        Create a new index
+      tags:
+        - Index
+      parameters:
+        - in: body
+          name: index settings
+          description: The index settings
+          required: true
+          default: |
+            {
+                "mappings" : {
+                      "wiki" : {
+                          "properties" : {
+                              "content" : { "type" : "text" }
+                          }
+                      }
+                  }
+            }
+          schema:
+            $ref: "#/definitions/CreateIndexRequest"
+      responses:
+        200:
+          description: The index was created successfully
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
 definitions:
   Error:
     type: object
@@ -51,6 +82,8 @@ definitions:
         description: The state of the system (operational, ...)
       version_information:
           $ref: '#/definitions/VersionInformation'
+  CreateIndexRequest:
+    type: object
   VersionInformation:
     type: object
     description: Version information
