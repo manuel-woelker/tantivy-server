@@ -8,14 +8,16 @@ use iron::response::{WriteBody};
 use iron::mime::{Mime, TopLevel, SubLevel, Attr, Value};
 
 use mount::Mount;
+use router::Router;
 use staticfile::Static;
 use serde::Serialize;
 use iron::modifier::Modifier;
 
 use std;
 
-use api;
+use rest;
 use errors::*;
+use service;
 
 use serde_json;
 
@@ -42,10 +44,14 @@ impl<T: Serialize + Send> WriteBody for JsonResponse<T> {
     }
 }
 
-pub struct Server {}
+pub struct Server {
+    service_handle: service::SearchServiceHandle,
+}
 impl Server {
-    pub fn new() -> Server {
-        Server {}
+    pub fn new(service_handle: service::SearchServiceHandle) -> Server {
+        Server {
+            service_handle: service_handle
+        }
     }
 
     pub fn run(&self) -> Result<()> {
@@ -61,10 +67,11 @@ impl Server {
         mount.mount("/docs/swagger/",
                     Static::new(Path::new("assets/swagger-ui/")));
 
-        let mut api_mount = Mount::new();
-        api_mount.mount("/status", api::status::StatusHandler {});
-        api_mount.mount("/index", api::index::CreateIndexHandler {});
-        mount.mount("/api", api_mount);
+        let mut api_router = Router::new();
+        api_router.get("/status", rest::status::StatusHandler::new(self.service_handle.clone()), "status");
+        api_router.put("/index/:index_name", rest::index::CreateIndexHandler::new(self.service_handle.clone()), "create index");
+//        api_router.post("/index/:index_name", rest::index::CreateIndexHandler::new(self.service_handle.clone()), "create index");
+        mount.mount("/api", api_router);
         let listening = Iron::new(mount).http("localhost:3000")?;
         info!("Server started on http://localhost:{}/", port);
         std::mem::drop(listening);

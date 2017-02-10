@@ -5,6 +5,7 @@ extern crate env_logger;
 
 extern crate iron;
 extern crate mount;
+extern crate router;
 extern crate staticfile;
 extern crate hyper;
 extern crate bodyparser;
@@ -23,7 +24,8 @@ extern crate error_chain;
 
 pub mod start;
 pub mod server;
-pub mod api;
+pub mod service;
+pub mod rest;
 pub mod errors;
 
 

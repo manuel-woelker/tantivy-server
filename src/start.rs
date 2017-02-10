@@ -3,8 +3,10 @@ use log::{LogRecord, LogLevelFilter};
 use env_logger::LogBuilder;
 use time;
 use tantivy;
+use std::sync;
 
 use ::server;
+use ::service;
 use errors::*;
 
 pub fn start() {
@@ -19,7 +21,9 @@ pub fn start() {
 fn start_internal() -> Result<()> {
     init_logging()?;
     info!("Starting up (Version: {}, tantivy version: {})", env!("CARGO_PKG_VERSION"), tantivy::version());
-    start_server()?;
+    let service = service::SearchService::new();
+    let service_handle = sync::Arc::new(sync::RwLock::new(service));
+    start_server(service_handle)?;
     Ok(())
 }
 
@@ -50,8 +54,8 @@ fn init_logging() -> Result<()> {
     Ok(())
 }
 
-fn start_server() -> Result<()> {
-    let server = server::Server::new();
+fn start_server(service_handle: service::SearchServiceHandle) -> Result<()> {
+    let server = server::Server::new(service_handle);
     server.run()?;
     Ok(())
 }

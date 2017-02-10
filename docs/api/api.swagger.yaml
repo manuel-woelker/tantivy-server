@@ -30,7 +30,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-  /index:
+  /index/{index_name}:
     put:
       summary: Create a new index
       description: |
@@ -38,6 +38,12 @@ paths:
       tags:
         - Index
       parameters:
+        - in: path
+          name: index_name
+          default: documents
+          description: Name of the index to be created
+          required: true
+          type: string
         - in: body
           name: index settings
           description: The index settings
