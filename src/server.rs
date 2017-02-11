@@ -72,6 +72,7 @@ impl Server {
         let mut api_router = Router::new();
         api_router.get("/status", rest::status::StatusHandler::new(), "status");
         api_router.put("/index/:index_name", rest::index::CreateIndexHandler::new(), "create index");
+        api_router.get("/index", rest::index::get_indices, "get indices");
 //        api_router.post("/index/:index_name", rest::index::CreateIndexHandler::new(self.service_handle.clone()), "create index");
         let mut api_chain = Chain::new(api_router);
         api_chain.link(::persistent::State::<service::SearchService>::both(self.service_handle.clone()));

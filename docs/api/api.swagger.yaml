@@ -30,6 +30,20 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
+  /index:
+    get:
+      summary: Get all indices
+      description: |
+        Get all index descriptions
+      tags:
+        - Index
+      responses:
+        200:
+          description: The list of index descriptions was returned correctly
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
   /index/{index_name}:
     put:
       summary: Create a new index
