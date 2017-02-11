@@ -36,7 +36,7 @@ impl Handler for StatusHandler {
             health: "octarine",
             version: env!("CARGO_PKG_VERSION"),
             tantivy_version: tantivy::version(),
-            number_of_indices: service_handle.get_index_descriptions().unwrap().len() as u64,
+            number_of_indices: itry!(service_handle.get_index_descriptions()).len() as u64,
         };
         Ok(Response::with(JsonResponse(status_response)))
     }
