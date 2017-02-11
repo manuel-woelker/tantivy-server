@@ -6,6 +6,7 @@ extern crate env_logger;
 extern crate iron;
 extern crate mount;
 extern crate router;
+extern crate persistent;
 extern crate staticfile;
 extern crate hyper;
 extern crate bodyparser;

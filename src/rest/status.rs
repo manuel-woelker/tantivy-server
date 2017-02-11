@@ -1,13 +1,14 @@
 
 use iron::prelude::*;
 use iron::Handler;
+use persistent::State;
 
 use tantivy;
 
 use server::JsonResponse;
 use bodyparser;
 
-use service::{SearchServiceHandle, IndexDescription};
+use service::{SearchService};
 
 #[derive(Debug, Serialize)]
 struct StatusResponse {
@@ -18,26 +19,24 @@ struct StatusResponse {
 }
 
 pub struct StatusHandler {
-    service_handle: SearchServiceHandle,
 }
 
 impl StatusHandler {
-    pub fn new(service_handle: SearchServiceHandle) -> StatusHandler {
-        StatusHandler {
-            service_handle: service_handle
-        }
+    pub fn new() -> StatusHandler {
+        StatusHandler {}
     }
 }
 
 impl Handler for StatusHandler {
     fn handle(&self, req: &mut Request) -> IronResult<Response> {
+        let service_handle = req.get::<State<SearchService>>().unwrap();
         let json_body = req.get::<bodyparser::Json>();
         println!("JSON body: {:?}", json_body);
         let status_response = StatusResponse {
             health: "octarine",
             version: env!("CARGO_PKG_VERSION"),
             tantivy_version: tantivy::version(),
-            number_of_indices: self.service_handle.read().expect("rwlock").index_descriptions.len() as u64,
+            number_of_indices: service_handle.read().expect("rwlock").index_descriptions.len() as u64,
         };
         Ok(Response::with(JsonResponse(status_response)))
     }

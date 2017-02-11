@@ -44,6 +44,8 @@ impl<T: Serialize + Send> WriteBody for JsonResponse<T> {
     }
 }
 
+impl ::iron::typemap::Key for service::SearchService { type Value = service::SearchService; }
+
 pub struct Server {
     service_handle: service::SearchServiceHandle,
 }
@@ -68,10 +70,12 @@ impl Server {
                     Static::new(Path::new("assets/swagger-ui/")));
 
         let mut api_router = Router::new();
-        api_router.get("/status", rest::status::StatusHandler::new(self.service_handle.clone()), "status");
-        api_router.put("/index/:index_name", rest::index::CreateIndexHandler::new(self.service_handle.clone()), "create index");
+        api_router.get("/status", rest::status::StatusHandler::new(), "status");
+        api_router.put("/index/:index_name", rest::index::CreateIndexHandler::new(), "create index");
 //        api_router.post("/index/:index_name", rest::index::CreateIndexHandler::new(self.service_handle.clone()), "create index");
-        mount.mount("/api", api_router);
+        let mut api_chain = Chain::new(api_router);
+        api_chain.link(::persistent::State::<service::SearchService>::both(self.service_handle.clone()));
+        mount.mount("/api", api_chain);
         let listening = Iron::new(mount).http("localhost:3000")?;
         info!("Server started on http://localhost:{}/", port);
         std::mem::drop(listening);

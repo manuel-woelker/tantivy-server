@@ -9,6 +9,7 @@ dependencies = [
  "iron 0.5.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.3.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "mount 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "persistent 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "router 0.5.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 0.9.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_derive 0.9.1 (registry+https://github.com/rust-lang/crates.io-index)",
